@@ -2,9 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import BackButton from "../../components/BackButton";
 
-export default function ResetPassword() {
+export default function EnterOtp() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
@@ -12,11 +11,11 @@ export default function ResetPassword() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setMessage("");
+    setLoading(true);
 
     try {
-      const res = await fetch("/api/reset-password", {
+      const res = await fetch("/api/send-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
@@ -26,30 +25,34 @@ export default function ResetPassword() {
       setLoading(false);
 
       if (!res.ok) {
-        setMessage(data.error || "Something went wrong. Please try again.");
-      } else {
-        setMessage("OTP has been sent to your email.");
-        router.push("/verify-token");
+        setMessage(data.error || "Failed to send OTP. Please try again.");
+        return;
       }
+
+      setMessage("OTP sent successfully! Redirecting...");
+      setTimeout(() => router.push("/verify-otp"), 2000);
     } catch (error) {
-      setLoading(false);
+      console.error("OTP Error:", error);
       setMessage("An unexpected error occurred. Please try again.");
+      setLoading(false);
     }
   };
 
   return (
-  <div>
-    <BackButton/>
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-        <h2 className="text-2xl font-bold text-center text-blue-600">Reset Password</h2>
+        <h2 className="text-2xl font-bold text-center text-blue-600">Enter Your Email</h2>
+        <p className="text-gray-600 text-center">We will send a verification OTP to your email.</p>
+
         {message && (
-          <p className={`text-center mt-4 ${message.includes("error") ? "text-red-500" : "text-gray-600"}`}>{message}</p>
+          <p className={`text-center mt-4 ${message.includes("error") ? "text-red-500" : "text-gray-600"}`}>
+            {message}
+          </p>
         )}
 
         <form onSubmit={handleSubmit} className="mt-6">
           <div className="mb-4">
-            <label className="block text-gray-600 font-semibold">Enter your Email</label>
+            <label className="block text-gray-600 font-semibold">Email Address</label>
             <input
               type="email"
               value={email}
@@ -69,6 +72,5 @@ export default function ResetPassword() {
         </form>
       </div>
     </div>
-  </div>
   );
 }

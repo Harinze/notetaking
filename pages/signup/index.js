@@ -6,10 +6,10 @@ import { Eye, EyeOff } from "lucide-react";
 
 export default function Signup() {
   const router = useRouter();
-  const [form, setForm] = useState({ fullName: "", email: "", password: "", country: "", phone: "" });
+  const [form, setForm] = useState({ fullName: "", email: "", country: "", phone: "" });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
+  
 
   const validateForm = () => {
     const { fullName, email, phone } = form;
@@ -42,27 +42,38 @@ export default function Signup() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage("");
-
-    if (!validateForm()) return;
-
+  
+    if (!validateForm()) {
+      setMessage("Please fill in all required fields correctly.");
+      return;
+    }
+  
     setLoading(true);
-
-    const res = await fetch("/api/signup", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
-    });
-
-    const data = await res.json();
-    setLoading(false);
-
-    if (!res.ok) {
-      setMessage(data.error || "Signup failed");
-    } else {
-      setMessage("Signup successful! Redirecting...");
-      setTimeout(() => router.push("/manage-notes"), 2000);
+  
+    try {
+      const res = await fetch("/api/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+  
+      const data = await res.json();
+      setLoading(false);
+  
+      if (!res.ok) {
+        setMessage(data.error || "Signup failed. Please try again.");
+        return;
+      }
+  
+      setMessage("Signup successful! Redirecting to verify OTP...");
+      setTimeout(() => router.push("/verify-token"), 2000);
+    } catch (error) {
+      console.error("Signup Error:", error);
+      setMessage("An unexpected error occurred. Please try again.");
+      setLoading(false);
     }
   };
+  
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
@@ -100,26 +111,6 @@ export default function Signup() {
             />
           </div>
 
-          <div className="mb-4 relative">
-  <label className="block text-gray-600 font-semibold">Password</label>
-  <div className="relative">
-    <input
-      type={showPassword ? "text" : "password"}
-      name="password"
-      value={form.password}
-      onChange={handleChange}
-      required
-      className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-600 pr-10"
-    />
-    <button
-      type="button"
-      className="absolute right-3 top-3 text-gray-500 hover:text-gray-700"
-      onClick={() => setShowPassword(!showPassword)}
-    >
-      {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-    </button>
-  </div>
-</div>
 
           <div className="mb-4">
             <label className="block text-gray-600 font-semibold">Country</label>

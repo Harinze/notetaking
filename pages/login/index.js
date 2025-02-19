@@ -19,23 +19,36 @@ export default function Login() {
     e.preventDefault();
     setLoading(true);
     setMessage("");
-
-    const res = await fetch("/api/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
-    });
-
-    const data = await res.json();
-    setLoading(false);
-
-    if (!res.ok) {
-      setMessage(data.error || "Login failed");
-    } else {
-      setMessage("Login successful! Redirecting...");
-      setTimeout(() => router.push("/manage-notes"), 2000);
+  
+    try {
+      const res = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+  
+      const data = await res.json();
+      setLoading(false);
+  
+      if (!res.ok) {
+        setMessage(data.error || "Login failed. Please try again.");
+        return;
+      }
+  
+      if (!data.isVerified || data.isVerified === false ) {
+        setMessage("Account not verified. Redirecting to OTP verification...");
+        setTimeout(() => router.push("/enter-email"), 2000);
+      } else {
+        setMessage("Login successful! Redirecting...");
+        setTimeout(() => router.push("/manage-notes"), 2000);
+      }
+    } catch (error) {
+      console.error("Login Error:", error);
+      setMessage("An unexpected error occurred. Please try again.");
+      setLoading(false);
     }
   };
+  
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
