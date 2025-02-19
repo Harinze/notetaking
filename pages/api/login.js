@@ -1,10 +1,10 @@
 import User from "../../models/User";
 import connectToDB from "../../lib/connectToDB";
 import bcrypt from "bcryptjs";
-import sessionMiddleware from "../../lib/session";
+
 
 export default async function handler(req, res) {
-  sessionMiddleware(req, res, async () => {
+
     if (req.method !== "POST") {
       return res.status(405).json({ error: "Method Not Allowed" });
     }
@@ -46,5 +46,5 @@ export default async function handler(req, res) {
       console.error("Login Error:", error);
       return res.status(500).json({ error: "Server error" });
     }
-  });
+ 
 }

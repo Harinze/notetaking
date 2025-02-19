@@ -25,24 +25,37 @@ export default function Home() {
   }, []);
 
   const fetchUser = async () => {
-    setLoadingUser(true)
+    setLoadingUser(true);
     try {
       const res = await fetch("/api/get-user");
       if (res.ok) {
         const data = await res.json();
         setUser(data.user);
-        fetchNotes(data.user.userId); 
+        fetchNotes(data.user.userId);
       } else {
+        // Try to get user from cookies as a fallback
+        const sessionCookie = document.cookie
+          .split("; ")
+          .find((row) => row.startsWith("session="));
+  
+        if (sessionCookie) {
+          const sessionData = JSON.parse(decodeURIComponent(sessionCookie.split("=")[1]));
+          setUser(sessionData);
+          fetchNotes(sessionData.userId);
+          return;
+        }
+  
         showToast("error", "User not authenticated!");
-        router.push('/login')
-        return
+        router.push("/login");
       }
     } catch (error) {
-      router.push('/login')
       console.error("Error fetching user:", error);
-      return
-    }finally{setLoadingUser(false)}
+      router.push("/login");
+    } finally {
+      setLoadingUser(false);
+    }
   };
+  
 
   const fetchNotes = async (userId) => {
     setLoading(true);
