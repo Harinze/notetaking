@@ -19,23 +19,32 @@ export default function VerifyToken() {
     e.preventDefault();
     setLoading(true);
     setMessage("");
-
+  
+    // Password validation regex: at least 8 characters, 1 letter, and 1 number
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+  
+    if (!passwordRegex.test(password)) {
+      setMessage("Password must be at least 8 characters long, with at least 1 letter and 1 number.");
+      setLoading(false);
+      return;
+    }
+  
     if (password !== confirmPassword) {
       setMessage("Passwords do not match");
       setLoading(false);
       return;
     }
-
+  
     try {
       const res = await fetch("/api/verify-token", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ otp, password }),
       });
-
+  
       const data = await res.json();
       setLoading(false);
-
+  
       if (!res.ok) {
         setMessage(data.error || "Invalid OTP");
       } else {
@@ -47,6 +56,7 @@ export default function VerifyToken() {
       setMessage("An unexpected error occurred. Please try again.");
     }
   };
+  
 
   return (
 
