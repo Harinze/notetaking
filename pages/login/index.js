@@ -2,12 +2,14 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function Login() {
   const router = useRouter();
   const [form, setForm] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -31,7 +33,7 @@ export default function Login() {
       setMessage(data.error || "Login failed");
     } else {
       setMessage("Login successful! Redirecting...");
-      setTimeout(() => router.push("/dashboard"), 2000);
+      setTimeout(() => router.push("/manage-notes"), 2000);
     }
   };
 
@@ -59,17 +61,26 @@ export default function Login() {
             />
           </div>
 
-          <div className="mb-4">
-            <label className="block text-gray-600 font-semibold">Password</label>
-            <input
-              type="password"
-              name="password"
-              value={form.password}
-              onChange={handleChange}
-              required
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-600"
-            />
-          </div>
+          <div className="mb-4 relative">
+  <label className="block text-gray-600 font-semibold">Password</label>
+  <div className="relative">
+    <input
+      type={showPassword ? "text" : "password"}
+      name="password"
+      value={form.password}
+      onChange={handleChange}
+      required
+      className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-600 pr-10"
+    />
+    <button
+      type="button"
+      className="absolute right-3 top-3 text-gray-500 hover:text-gray-700"
+      onClick={() => setShowPassword(!showPassword)}
+    >
+      {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+    </button>
+  </div>
+</div>
 
           <button
             type="submit"
@@ -81,11 +92,19 @@ export default function Login() {
         </form>
 
         <p className="text-center mt-4 text-gray-500">
-          Don't have an account?{" "}
-          <a href="/signup" className="text-blue-600 font-semibold hover:underline">
-            Sign Up
-          </a>
-        </p>
+  Don't have an account?{" "}
+  <a href="/signup" className="text-blue-600 font-semibold hover:underline">
+    Sign Up
+  </a>
+</p>
+<p className="text-center mt-2">
+  <a href="/reset-password" className="text-blue-600 font-semibold hover:underline">
+    Forgot Password?
+  </a>
+</p>
+
+
+
       </div>
     </div>
   );

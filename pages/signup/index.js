@@ -2,12 +2,38 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function Signup() {
   const router = useRouter();
   const [form, setForm] = useState({ fullName: "", email: "", password: "", country: "", phone: "" });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+
+  const validateForm = () => {
+    const { fullName, email, phone } = form;
+
+    // Full Name: Must be at least two words
+    if (!/^\w+\s+\w+/.test(fullName)) {
+      setMessage("Full name must contain at least two words.");
+      return false;
+    }
+
+    // Email Validation
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setMessage("Invalid email format.");
+      return false;
+    }
+
+    // Phone Validation: Must contain only digits, between 10-15 characters
+    if (phone && !/^\d{10,15}$/.test(phone)) {
+      setMessage("Phone number must be 10-15 digits long.");
+      return false;
+    }
+
+    return true;
+  };
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -15,8 +41,11 @@ export default function Signup() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setMessage("");
+
+    if (!validateForm()) return;
+
+    setLoading(true);
 
     const res = await fetch("/api/signup", {
       method: "POST",
@@ -31,7 +60,7 @@ export default function Signup() {
       setMessage(data.error || "Signup failed");
     } else {
       setMessage("Signup successful! Redirecting...");
-      setTimeout(() => router.push("/dashboard"), 2000);
+      setTimeout(() => router.push("/manage-notes"), 2000);
     }
   };
 
@@ -71,17 +100,26 @@ export default function Signup() {
             />
           </div>
 
-          <div className="mb-4">
-            <label className="block text-gray-600 font-semibold">Password</label>
-            <input
-              type="password"
-              name="password"
-              value={form.password}
-              onChange={handleChange}
-              required
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-600"
-            />
-          </div>
+          <div className="mb-4 relative">
+  <label className="block text-gray-600 font-semibold">Password</label>
+  <div className="relative">
+    <input
+      type={showPassword ? "text" : "password"}
+      name="password"
+      value={form.password}
+      onChange={handleChange}
+      required
+      className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-600 pr-10"
+    />
+    <button
+      type="button"
+      className="absolute right-3 top-3 text-gray-500 hover:text-gray-700"
+      onClick={() => setShowPassword(!showPassword)}
+    >
+      {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+    </button>
+  </div>
+</div>
 
           <div className="mb-4">
             <label className="block text-gray-600 font-semibold">Country</label>

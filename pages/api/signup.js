@@ -1,28 +1,41 @@
-import { NextResponse } from "next/server";
 import User from "../../models/User";
 import connectToDB from "../../lib/connectToDB";
+import bcrypt from "bcryptjs";
 
+export default async function handler(req, res) {
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method Not Allowed" });
+  }
 
-export async function POST(req) {
   try {
-    await connectToDB()
+    await connectToDB();
 
-    const { fullName, email, password, country, phone } = await req.json();
+    const { fullName, email, password, country, phone } = req.body;
 
     if (!fullName || !email || !password) {
-      return NextResponse.json({ error: "Full Name, Email, and Password are required" }, { status: 400 });
+      return res.status(400).json({ error: "Full Name, Email, and Password are required" });
     }
 
+    // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return NextResponse.json({ error: "Email already registered" }, { status: 400 });
+      return res.status(400).json({ error: "Email already registered" });
     }
 
-    const newUser = await User.create({ fullName, email, password, country, phone });
+    // Hash password before saving
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    return NextResponse.json({ success: true, user: newUser }, { status: 201 });
+    const newUser = await User.create({
+      fullName,
+      email,
+      password: hashedPassword,
+      country,
+      phone,
+    });
+
+    return res.status(201).json({ success: true, user: newUser });
   } catch (error) {
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+    console.error("Signup Error:", error);
+    return res.status(500).json({ error: "Server error" });
   }
 }
-

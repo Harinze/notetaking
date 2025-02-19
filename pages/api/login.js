@@ -1,31 +1,34 @@
-import { NextResponse } from "next/server";
 import User from "../../models/User";
 import connectToDB from "../../lib/connectToDB";
 import bcrypt from "bcryptjs";
 
+export default async function handler(req, res) {
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method Not Allowed" });
+  }
 
-export async function POST(req) {
   try {
-   await connectToDB()
+    await connectToDB();
 
-    const { email, password } = await req.json();
+    const { email, password } = req.body;
 
     if (!email || !password) {
-      return NextResponse.json({ error: "Email and Password are required" }, { status: 400 });
+      return res.status(400).json({ error: "Email and Password are required" });
     }
 
     const user = await User.findOne({ email });
     if (!user) {
-      return NextResponse.json({ error: "Invalid email or password" }, { status: 401 });
+      return res.status(401).json({ error: "Invalid email or password" });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return NextResponse.json({ error: "Invalid email or password" }, { status: 401 });
+      return res.status(401).json({ error: "Invalid email or password" });
     }
 
-    return NextResponse.json({ success: true, message: "Login successful", user }, { status: 200 });
+    return res.status(200).json({ success: true, message: "Login successful", user });
   } catch (error) {
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+    console.error("Login Error:", error);
+    return res.status(500).json({ error: "Server error" });
   }
 }
