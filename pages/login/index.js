@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
+import BackHomeButton from "../../components/BackHomeButton";
 
 export default function Login() {
   const router = useRouter();
@@ -51,7 +52,9 @@ export default function Login() {
   
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+  <div>
+    <BackHomeButton/>
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
         <h2 className="text-2xl font-bold text-center text-blue-600">Login to Your Account</h2>
 
@@ -120,5 +123,6 @@ export default function Login() {
 
       </div>
     </div>
+  </div>
   );
 }

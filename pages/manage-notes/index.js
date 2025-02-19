@@ -1,9 +1,12 @@
+
 import { useState, useEffect } from "react";
 import NoteInput from "../../components/NoteInput";
 import NoteList from "../../components/NoteList";
 import SearchBar from "../../components/SearchBar";
 import Header from "../../components/Header";
 import { showToast } from "../../utils/toastConfig"; 
+import {useRouter} from "next/navigation";
+import { Loader2 } from "lucide-react";
 
 export default function Home() {
   const [notes, setNotes] = useState([]);
@@ -12,15 +15,39 @@ export default function Home() {
   const [actionLoading, setActionLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(null);
   const [updateLoading, setUpdateLoading] = useState(null);
+  const [user, setUser] = useState(null);
+  const [loadingUser, setLoadingUser] = useState(false)
+  const router = useRouter()
 
+  // Fetch user details
   useEffect(() => {
-    fetchNotes();
+    fetchUser();
   }, []);
 
-  const fetchNotes = async () => {
+  const fetchUser = async () => {
+    setLoadingUser(true)
+    try {
+      const res = await fetch("/api/get-user");
+      if (res.ok) {
+        const data = await res.json();
+        setUser(data.user);
+        fetchNotes(data.user.userId); 
+      } else {
+        showToast("error", "User not authenticated!");
+        router.push('/login')
+        return
+      }
+    } catch (error) {
+      router.push('/login')
+      console.error("Error fetching user:", error);
+      return
+    }finally{setLoadingUser(false)}
+  };
+
+  const fetchNotes = async (userId) => {
     setLoading(true);
     try {
-      const res = await fetch("/api/notes");
+      const res = await fetch(`/api/notes?userId=${userId}`);
       const data = await res.json();
       setNotes(data);
     } catch (error) {
@@ -30,17 +57,22 @@ export default function Home() {
   };
 
   const addNote = async (note, tag) => {
+    if (!user) {
+      showToast("error", "You must be logged in to add notes.");
+      return;
+    }
+
     setActionLoading(true);
     try {
       const res = await fetch("/api/notes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ note, tag }),
+        body: JSON.stringify({ note, tag, userId: user.userId }),
       });
 
       if (!res.ok) throw new Error("Failed to add note");
 
-      fetchNotes();
+      fetchNotes(user.userId);
       showToast("success", "Note added successfully!");
     } catch (error) {
       showToast("error", "Error adding note!");
@@ -49,56 +81,87 @@ export default function Home() {
   };
 
   const updateNote = async (id, newText) => {
+    if (!user) {
+      showToast("error", "You must be logged in to update notes.");
+      return;
+    }
+
     setUpdateLoading(id);
     try {
       const res = await fetch("/api/notes", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, newText }),
+        body: JSON.stringify({ id, newText, userId: user.userId }),
       });
 
       if (!res.ok) throw new Error("Failed to update note");
 
-      fetchNotes();
+      fetchNotes(user.userId);
       showToast("success", "Note updated!");
     } catch (error) {
-      showToast(error.response);
+      showToast("error", "Error updating note!");
     }
-    setUpdateLoading(id);
+    setUpdateLoading(null);
   };
 
   const deleteNote = async (id) => {
+    if (!user) {
+      showToast("error", "You must be logged in to delete notes.");
+      return;
+    }
+
     setDeleteLoading(id);
     try {
       const res = await fetch("/api/notes", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id }),
+        body: JSON.stringify({ id, userId: user.userId }),
       });
 
       if (!res.ok) throw new Error("Failed to delete note");
 
-      fetchNotes();
+      fetchNotes(user.userId);
       showToast("success", "Note deleted!");
     } catch (error) {
       showToast("error", "Error deleting note!");
     }
-    setDeleteLoading(id);
+    setDeleteLoading(null);
   };
 
   const filteredNotes = notes?.filter((note) =>
     note.text.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+
+if (loadingUser) {
+  return (
+    <div className="flex items-center justify-center h-screen bg-gray-100">
+      <div className="flex flex-col items-center">
+        <Loader2 size={40} className="animate-spin text-blue-600" />
+        <p className="text-gray-600 text-lg mt-3 font-medium">
+          Loading your data...
+        </p>
+      </div>
+    </div>
+  );
+}
+
+
   return (
     <div>
       <Header />
       <div className="min-h-screen p-6 bg-gray-50 flex flex-col items-center">
         <div className="w-full max-w-3xl space-y-6 bg-white shadow-lg rounded-2xl p-6">
-          {/* Search Bar */}
+          {/* User Info */}
+          {user && (
+            <div className="mb-4 text-center">
+              <h2 className="text-lg font-semibold">Welcome, {user.fullName}!</h2>
+              {/* <p className="text-sm text-gray-500">Email: {user.email}</p> */}
+            </div>
+          )}
+
           <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
 
-          {/* Note Input (Disable button while loading) */}
           <NoteInput addNote={addNote} isLoading={actionLoading} />
 
           {/* Loading State */}
@@ -107,7 +170,13 @@ export default function Home() {
               <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500"></div>
             </div>
           ) : (
-            <NoteList notes={filteredNotes} deleteNote={deleteNote} updateNote={updateNote} updateLoading={updateLoading} deleteLoading={deleteLoading} />
+            <NoteList
+              notes={filteredNotes}
+              deleteNote={deleteNote}
+              updateNote={updateNote}
+              updateLoading={updateLoading}
+              deleteLoading={deleteLoading}
+            />
           )}
         </div>
       </div>
