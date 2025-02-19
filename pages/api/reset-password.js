@@ -1,6 +1,5 @@
 import User from "../../models/User";
 import connectToDB from "../../lib/connectToDB";
-import crypto from "crypto";
 import nodemailer from "nodemailer";
 
 export default async function handler(req, res) {
@@ -24,7 +23,7 @@ export default async function handler(req, res) {
     // Generate a 6-digit OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     user.resetToken = otp;
-    user.resetTokenExpiry = Date.now() + 3600000; // 1 hour expiry
+    user.resetTokenExpiry = Date.now() + 3600000; 
     await user.save();
 
     // Configure SMTP Transporter
@@ -36,7 +35,6 @@ export default async function handler(req, res) {
       },
     });
 
-    // HTML Email Template with Branding
     const mailOptions = {
       from: `"Note Making" <${process.env.GMAIL_USER}>`,
       to: user.email,
