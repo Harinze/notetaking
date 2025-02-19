@@ -21,30 +21,26 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "User not found" });
     }
 
-    // Generate reset token
+  
     const resetToken = crypto.randomBytes(32).toString("hex");
     user.resetToken = resetToken;
-    user.resetTokenExpiry = Date.now() + 3600000; // 1 hour
+    user.resetTokenExpiry = Date.now() + 3600000;
     await user.save();
 
     // Custom SMTP Configuration
     const transporter = nodemailer.createTransport({
-      host: process.env.INFO_EMAIL_HOST, // Your custom SMTP host
-      port: 465, // Use 465 for SSL or 587 for TLS
-      secure: true, // True for 465, false for 587
+      service: 'gmail',
       auth: {
-        user: process.env.INFO_EMAIL, // SMTP Username
-        pass: process.env.INFO_EMAIL_PASSWORD, // SMTP Password
-      },
-      tls: {
-        rejectUnauthorized: false, // Change to true if your certificate is valid
+        user: process.env.GMAIL_USER, // Your Gmail address
+        pass: process.env.GMAIL_PASSWORD, // Your Gmail app password
       },
     });
+    
 
     // Send Reset Email
     const resetURL = `https://notetaking-two.vercel.app/reset-password/${resetToken}`;
     const mailOptions = {
-      from: `"Support Team" <${process.env.INFO_EMAIL}>`, // Display Name + Email
+      from: `"Note Making" <${process.env.GMAIL_USER}>`, // Display Name + Email
       to: user.email,
       subject: "Password Reset Request",
       html: `<p>Click <a href="${resetURL}">here</a> to reset your password. This link expires in 1 hour.</p>`,
