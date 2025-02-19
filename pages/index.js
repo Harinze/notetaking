@@ -10,8 +10,8 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
-  const [deleteLoading, setDeleteLoading] = useState(false);
-  const [updateLoading, setUpdateLoading] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(null);
+  const [updateLoading, setUpdateLoading] = useState(null);
 
   useEffect(() => {
     fetchNotes();
@@ -49,7 +49,7 @@ export default function Home() {
   };
 
   const updateNote = async (id, newText) => {
-    setUpdateLoading(true);
+    setUpdateLoading(id);
     try {
       const res = await fetch("/api/notes", {
         method: "PUT",
@@ -64,11 +64,11 @@ export default function Home() {
     } catch (error) {
       showToast("error", "Error updating note!");
     }
-    setUpdateLoading(false);
+    setUpdateLoading(id);
   };
 
   const deleteNote = async (id) => {
-    setDeleteLoading(true);
+    setDeleteLoading(id);
     try {
       const res = await fetch("/api/notes", {
         method: "DELETE",
@@ -83,7 +83,7 @@ export default function Home() {
     } catch (error) {
       showToast("error", "Error deleting note!");
     }
-    setDeleteLoading(false);
+    setDeleteLoading(id);
   };
 
   const filteredNotes = notes?.filter((note) =>

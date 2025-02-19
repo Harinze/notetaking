@@ -43,29 +43,33 @@ export default function NoteList({ notes, deleteNote, updateNote, deleteLoading,
 
             <div className="flex gap-2 mt-3 sm:mt-0">
               {editingId === note._id ? (
-                <button
+                  <button
                   onClick={() => saveEdit(note._id)}
                   className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 ml-4 transition-all"
+                  disabled={updateLoading === note._id}
                 >
-                  {updateLoading ? "Saving" : "Save"}
+                  {updateLoading === note._id ? "Saving..." : "Save"}
                 </button>
               ) : (
                 <button
                   onClick={() => startEditing(note._id, note.text)}
-                  className="bg-yellow-500 text-white ml-4 px-4 py-2 rounded-lg hover:bg-yellow-600 transition-all"
+                  className="bg-yellow-500 text-white ml-1 px-4 py-2 rounded-lg hover:bg-gray-400 transition-all"
                 >
                   Edit
                 </button>
               )}
-               <button
-                  onClick={() => {
+                  <button
+                  onClick={async () => {
                     if (window.confirm("Are you sure you want to delete this note?")) {
-                      deleteNote(note._id);
+                     
+                      await deleteNote(note._id);
+                      
                     }
                   }}
                   className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-all"
+                  disabled={deleteLoading === note._id}
                 >
-                  {deleteLoading ? "Deleting" : "Delete"}
+                  {deleteLoading === note._id ? "Deleting..." : "Delete"}
                 </button>
             </div>
           </div>
