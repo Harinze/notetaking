@@ -36,10 +36,10 @@ export default async function handler(req, res) {
         },
       };
 
-      // res.setHeader(
-      //   "Set-Cookie",
-      //   `session=${JSON.stringify(req.session.user)}; Path=/; HttpOnly; Max-Age=${24 * 60 * 60}`
-      // );
+      res.setHeader(
+        "Set-Cookie",
+        `session=${JSON.stringify(req.session.user)}; Path=/; HttpOnly; Max-Age=${24 * 60 * 60}`
+      );
 
       return res.status(200).json({ success: true, message: "Login successful", isVerified: user.isVerified });
     } catch (error) {

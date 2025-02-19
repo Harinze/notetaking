@@ -2,10 +2,11 @@ import "../styles/globals.css";
 import Head from "next/head";
 import { Toaster } from "react-hot-toast";
 import toastConfig from "../utils/toastConfig";
+import ErrorBoundary from "../components/ErrorBoundary"; 
 
 function MyApp({ Component, pageProps }) {
   return (
-    <>
+    <ErrorBoundary>
       <Head>
         <title>ProNotes - Smart & Secure Note-Taking</title>
         <meta
@@ -25,7 +26,7 @@ function MyApp({ Component, pageProps }) {
       </Head>
       <Toaster toastOptions={toastConfig} />
       <Component {...pageProps} />
-    </>
+    </ErrorBoundary>
   );
 }
 
