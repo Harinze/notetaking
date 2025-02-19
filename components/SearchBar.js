@@ -1,4 +1,4 @@
-import { Search } from "lucide-react"; // Importing an icon for a more professional look
+import { Search } from "lucide-react"; 
 
 export default function SearchBar({ searchQuery, setSearchQuery }) {
   return (
