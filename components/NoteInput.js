@@ -1,14 +1,16 @@
-import React, {useState} from 'react'
+import React, { useState } from 'react';
 
 export default function NoteInput({ addNote, isLoading }) {
     const [note, setNote] = useState("");
     const [tag, setTag] = useState("");
+    const [code, setCode] = useState("");
   
     const handleSubmit = () => {
       if (note.trim()) {
-        addNote(note, tag);
+        addNote(note, tag, code);
         setNote("");
         setTag("");
+        setCode("");
       }
     };
   
@@ -27,6 +29,13 @@ export default function NoteInput({ addNote, isLoading }) {
           value={tag}
           onChange={(e) => setTag(e.target.value)}
         />
+        <input
+          type="text"
+          placeholder="Code (optional)"
+          className="w-full p-2 border rounded-md mt-2"
+          value={code}
+          onChange={(e) => setCode(e.target.value)}
+        />
         <button
           onClick={handleSubmit}
           disabled={isLoading}
@@ -40,5 +49,5 @@ export default function NoteInput({ addNote, isLoading }) {
         </button>
       </div>
     );
-  }
-  
+}
+
