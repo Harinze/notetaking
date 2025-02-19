@@ -39,7 +39,7 @@ export default async function handler(req, res) {
     });
 
     const mailOptions = {
-      from: process.env.EMAIL_USER,
+      from: `"Note Making" <${process.env.GMAIL_USER}>`,
       to: email,
       subject: "Your OTP for Verification",
       html: `
