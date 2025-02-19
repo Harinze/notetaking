@@ -1,0 +1,49 @@
+# Dependencies
+node_modules/
+.pnp/
+.pnp.js
+
+# Testing
+coverage/
+
+# Environment Variables
+.env.local
+.env
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Next.js build output
+.next/
+out/
+
+# VS Code settings
+.vscode/
+
+# Logs & debugging
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+turbo.log
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Editor files
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
+
+# IDEs
+.idea/
+*.iml
+
+# TypeScript build
+*.tsbuildinfo
+
+# Optional: Include `.next/cache` for faster local builds, but exclude in production
+.next/cache/
