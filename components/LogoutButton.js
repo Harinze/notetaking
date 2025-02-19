@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { LogOut, Loader2 } from "lucide-react";
+import { showToast } from "../utils/toastConfig";
 
 export default function LogoutButton({ className = "" }) {
   const router = useRouter();
@@ -20,8 +21,9 @@ export default function LogoutButton({ className = "" }) {
 
       if (response.ok) {
         router.push("/");
+        window.location.reload()
       } else {
-        throw new Error("Logout failed. Please try again.");
+        showToast("Logout failed. Please try again or refresh the page");
       }
     } catch (error) {
       console.error("Logout error:", error);
@@ -40,7 +42,7 @@ export default function LogoutButton({ className = "" }) {
           className={`flex items-center px-4 py-2 border border-blue-600 rounded-full shadow-md transition-all duration-300 ease-in-out ${
             loading
               ? "bg-gray-400 text-gray-600 cursor-not-allowed"
-              : "text-gray-400 hover:bg-blue-600 hover:text-white"
+              : "text-blue-600 hover:bg-blue-600 hover:text-white"
           } ${className}`}
         >
           {loading ? (
