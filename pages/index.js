@@ -18,7 +18,7 @@ export default function Home() {
         const res = await fetch("/api/get-user", { credentials: "include" });
         if (res.ok) {
           const data = await res.json();
-          setUser(data.user);
+          setUser(data);
         }
       } catch (error) {
         console.error("Error fetching user session:", error);
