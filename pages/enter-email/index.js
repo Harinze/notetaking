@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import BackButton from "../../components/BackButton";
 
 export default function EnterOtp() {
   const [email, setEmail] = useState("");
@@ -39,7 +40,9 @@ export default function EnterOtp() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+   <div>
+    <BackButton/>
+     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
         <h2 className="text-2xl font-bold text-center text-blue-600">Enter Your Email</h2>
         <p className="text-gray-600 text-center">We will send a verification OTP to your email.</p>
@@ -72,5 +75,6 @@ export default function EnterOtp() {
         </form>
       </div>
     </div>
+   </div>
   );
 }
