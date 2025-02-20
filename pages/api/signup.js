@@ -59,7 +59,7 @@ async function sendOTPEmail(email, otp) {
      });
 
      const mailOptions = {
-      from: `"Note Making" <${process.env.GMAIL_USER}>`,
+      from: `"Note Master" <${process.env.GMAIL_USER}>`,
       to: email,
       subject: "Your OTP Code - Password Reset",
       html: `

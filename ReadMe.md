@@ -1,8 +1,8 @@
-# ***ProNotes - Smart & Secure Note-Taking***
+# ***Note Master - Smart & Secure Note-Taking***
 
 ## 🚀 ***Introduction***
 
-**Note Making** is a **modern, user-friendly, and highly responsive** note-taking app built with **Next.js** and **MongoDB**. It provides a seamless experience for professionals who need to take, manage, and access their notes **anytime, anywhere**. With robust security measures, **cookie-based session authentication**, and an intuitive UI, **ProNotes** ensures your data remains **private and secure**.
+**Note Master** is a **modern, user-friendly, and highly responsive** note-taking app built with **Next.js** and **MongoDB**. It provides a seamless experience for professionals who need to take, manage, and access their notes **anytime, anywhere**. With robust security measures, **cookie-based session authentication**, and an intuitive UI, **Note Master** ensures your data remains **private and secure**.
 
 ---
 
@@ -20,7 +20,7 @@
 
 🚀 **Coming Soon:**
 
-- 📲 **Share Notes on Social Media** – Select your platform and post directly from **ProNotes**!
+- 📲 **Share Notes on Social Media** – Select your platform and post directly from **Note Master**!
 
 ---
 
@@ -30,7 +30,7 @@
 Frontend:  Next.js, React, Tailwind CSS
 Backend:   Next.js API Routes, MongoDB, Mongoose
 Auth:      Cookie-based session authentication
-Hosting:   cPanel (or preferred hosting service)
+Hosting:   vercel (or preferred hosting service)
 ```
 
 ---
@@ -81,7 +81,7 @@ App will be available at **[http://localhost:3000](http://localhost:3000)**.
 
 ## 📱 ***Pro Mobile Version***
 
-**ProNotes Pro** is available on **Google Play Store** for an optimized mobile experience.
+**Note Master Pro** is available on **Google Play Store** for an optimized mobile experience.
 
 ---
 

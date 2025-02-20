@@ -24,30 +24,52 @@ export default function Home() {
     fetchUser();
   }, []);
 
+  // const fetchUser = async () => {
+  //   setLoadingUser(true);
+  //   try {
+  //     const res = await fetch("/api/get-user");
+  //     if (res.ok) {
+  //       const data = await res.json();
+  //       setUser(data);
+  //       fetchNotes(data.userId);
+  //     } else {
+  //       const sessionCookie = document.cookie
+  //         .split("; ")
+  //         .find((row) => row.startsWith("session="));
+  
+  //       if (sessionCookie) {
+  //         const sessionData = JSON.parse(decodeURIComponent(sessionCookie.split("=")[1]));
+  //         setUser(sessionData);
+  //         fetchNotes(sessionData.userId);
+  //         return;
+  //       }
+  
+  //       showToast("error", "User not authenticated!");
+  //       router.push("/login");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error fetching user:", error);
+  //     router.push("/login");
+  //   } finally {
+  //     setLoadingUser(false);
+  //   }
+  // };
+  
+
   const fetchUser = async () => {
     setLoadingUser(true);
     try {
       const res = await fetch("/api/get-user");
-      if (res.ok) {
-        const data = await res.json();
-        setUser(data.user);
-        fetchNotes(data.user.userId);
-      } else {
-        // Try to get user from cookies as a fallback
-        const sessionCookie = document.cookie
-          .split("; ")
-          .find((row) => row.startsWith("session="));
   
-        if (sessionCookie) {
-          const sessionData = JSON.parse(decodeURIComponent(sessionCookie.split("=")[1]));
-          setUser(sessionData);
-          fetchNotes(sessionData.userId);
-          return;
-        }
-  
+      if (!res.ok) {
         showToast("error", "User not authenticated!");
         router.push("/login");
+        return;
       }
+  
+      const data = await res.json();
+      setUser(data);
+      fetchNotes(data.userId);
     } catch (error) {
       console.error("Error fetching user:", error);
       router.push("/login");
@@ -177,7 +199,6 @@ if (loadingUser) {
 
           <NoteInput addNote={addNote} isLoading={actionLoading} />
 
-          {/* Loading State */}
           {loading ? (
             <div className="flex justify-center py-4">
               <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500"></div>

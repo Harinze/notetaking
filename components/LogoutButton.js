@@ -23,7 +23,7 @@ export default function LogoutButton({ className = "" }) {
         router.push("/");
         window.location.reload()
       } else {
-        showToast("Logout failed. Please try again or refresh the page");
+        showToast("Logout failed. Please try again or refresh the page, refresh the page");
       }
     } catch (error) {
       console.error("Logout error:", error);
