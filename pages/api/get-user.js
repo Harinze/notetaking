@@ -4,7 +4,7 @@ export default async function handler(req, res) {
   withSession(req, res, async () => {
     let user = req.session.user;
 
-    // Fallback to cookies if session is missing
+    //Fallback to cookies if session is missing
     if (!user) {
       try {
         const cookieHeader = req.headers.cookie || "";
