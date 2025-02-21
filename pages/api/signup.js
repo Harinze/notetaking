@@ -17,17 +17,15 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Full Name, Email, and Password are required" });
     }
 
-    // Check if user already exists
+
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ error: "Email already registered" });
     }
 
-    // Generate OTP (6-digit random number)
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // OTP valid for 10 minutes
+    const otpExpires = new Date(Date.now() + 10 * 60 * 1000); 
 
-    // Create new user with OTP
     const newUser = await User.create({
       fullName,
       email,
@@ -38,7 +36,6 @@ export default async function handler(req, res) {
       
     });
 
-    // Send OTP to user's email
     await sendOTPEmail(email, otp);
 
     return res.status(201).json({ success: true, message: "OTP sent to email." });
@@ -48,7 +45,7 @@ export default async function handler(req, res) {
   }
 }
 
-// Function to send OTP via email
+
 async function sendOTPEmail(email, otp) {
   const transporter = nodemailer.createTransport({
        service: "gmail",

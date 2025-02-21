@@ -1,15 +1,16 @@
+import Link from "next/link";
+import { Home } from "lucide-react";
 import LogoutButton from "./LogoutButton";
 
 export default function Header() {
   return (
-
-
-    <div>
+    <header className="relative w-full bg-blue-600 shadow-md py-6 px-4 sm:px-6 md:px-10 flex items-center justify-between">
       
-        <LogoutButton />
-    
-      <header className="relative w-full bg-blue-600 shadow-md py-6 px-4 sm:px-6 md:px-10">
-      <div className="flex flex-col items-center justify-center text-center px-4">
+      <Link href="/" className="text-white hover:text-gray-200 transition">
+        <Home size={28} />
+      </Link>
+      
+      <div className="flex flex-col items-center text-center flex-grow">
         <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">
           Daily Notes
         </h1>
@@ -17,7 +18,8 @@ export default function Header() {
           Capture your thoughts, stay organized.
         </p>
       </div>
+      
+      <LogoutButton />
     </header>
-    </div>
   );
 }

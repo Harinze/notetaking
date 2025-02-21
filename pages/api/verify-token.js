@@ -16,7 +16,6 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: "OTP and password are required" });
   }
 
-  // Validate password: At least 8 characters, 1 letter, 1 number
   const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
   if (!passwordRegex.test(password)) {
     return res.status(400).json({
@@ -27,7 +26,6 @@ export default async function handler(req, res) {
   try {
     await connectToDB();
 
-    // Find user with valid OTP
     const user = await User.findOne({
       resetToken: otp,
       resetTokenExpiry: { $gt: Date.now() },
@@ -44,13 +42,12 @@ export default async function handler(req, res) {
       throw new Error("Password hashing failed");
     }
 
-    // Update user data
+
     user.password = hashedPassword;
     user.isVerified = true;
     user.resetToken = undefined;
     user.resetTokenExpiry = undefined;
 
-    // Save the user
     await user.save();
 
     res.status(200).json({ message: "Password reset successfully" });

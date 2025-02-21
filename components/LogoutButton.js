@@ -21,6 +21,7 @@ export default function LogoutButton({ className = "" }) {
 
       if (response.ok) {
         router.push("/");
+        window.location.reload()
       } else {
         showToast("Logout failed. Please try again or refresh the page, refresh the page");
       }
@@ -41,7 +42,7 @@ export default function LogoutButton({ className = "" }) {
           className={`flex items-center px-4 py-2 border border-blue-600 rounded-full shadow-md transition-all duration-300 ease-in-out ${
             loading
               ? "bg-gray-400 text-gray-600 cursor-not-allowed"
-              : "text-blue-600 hover:bg-blue-600 hover:text-white"
+              : "text-white hover:bg-blue-600 hover:text-white"
           } ${className}`}
         >
           {loading ? (
@@ -51,7 +52,7 @@ export default function LogoutButton({ className = "" }) {
             </>
           ) : (
             <>
-              <LogOut size={22} className="mr-2" />
+              <LogOut size={22} className="mr-2 text-white" />
               Logout
             </>
           )}
