@@ -1,10 +1,13 @@
 import Session from "../../models/Session";
 import cookie from "cookie";
+import connectToDB from "../../lib/connectToDB";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method Not Allowed" });
   }
+
+ await connectToDB()
 
   try {
     const cookies = cookie.parse(req.headers.cookie || "");
