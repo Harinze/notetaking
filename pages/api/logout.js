@@ -1,9 +1,36 @@
-import withSession from "../../lib/session";
+import Session from "../../models/Session";
+import cookie from "cookie";
 
 export default async function handler(req, res) {
-  await withSession(req, res, async () => {
-    req.session = null; 
-    res.setHeader("Set-Cookie", "session=; Path=/; HttpOnly; Max-Age=0"); 
-    return res.status(200).json({ success: true, message: "Logged out successfully" });
-  });
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method Not Allowed" });
+  }
+
+  try {
+    const cookies = cookie.parse(req.headers.cookie || "");
+    const sessionToken = cookies.sessionToken;
+
+    if (sessionToken) {
+      await Session.deleteOne({ sessionToken });
+    }
+
+
+    res.setHeader(
+      "Set-Cookie",
+      cookie.serialize("sessionToken", "", {
+        httpOnly: true,
+        secure: true,
+        sameSite: "lax",
+        path: "/",
+        maxAge: 0, 
+      })
+    );
+
+    return res.status(200).json({ success: true, message: "Logged out successfully." });
+  } catch (error) {
+    console.error("Logout Error:", error);
+    return res.status(500).json({ error: "Server error" });
+  }
 }
+
+

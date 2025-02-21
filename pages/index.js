@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { Button } from "../components/ui/button";
 import LogoutButton from "../components/LogoutButton";
@@ -10,7 +9,6 @@ import LogoutButton from "../components/LogoutButton";
 export default function Home() {
   const [isOpen, setIsOpen] = useState(false);
   const [user, setUser] = useState(null);
-  const router = useRouter();
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -18,7 +16,7 @@ export default function Home() {
         const res = await fetch("/api/get-user", { credentials: "include" });
         if (res.ok) {
           const data = await res.json();
-          setUser(data);
+          setUser(data?.user);
         }
       } catch (error) {
         console.error("Error fetching user session:", error);
@@ -30,16 +28,15 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-white text-black">
-      {/* Navbar */}
+     
       <nav className="bg-gray-400 text-white shadow-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
-            {/* Logo */}
+           
             <h1 className="text-2xl font-bold">
               Note<span className="text-blue-600">Master</span>
             </h1>
 
-            {/* Desktop Menu */}
             <div className="hidden md:flex space-x-4">
               {user ? (
                 <LogoutButton />
@@ -59,7 +56,6 @@ export default function Home() {
               )}
             </div>
 
-            {/* Mobile Menu Button */}
             <button
               className="md:hidden flex items-center"
               onClick={() => setIsOpen(!isOpen)}
@@ -68,7 +64,6 @@ export default function Home() {
             </button>
           </div>
 
-          {/* Mobile Dropdown Menu */}
           {isOpen && (
             <div className="md:hidden flex flex-col space-y-2 bg-gray-500 py-4 px-6 rounded-lg">
               {user ? (
@@ -92,7 +87,6 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* Hero Section */}
       <header className="text-center py-20 bg-gray-100">
         <h2 className="text-4xl font-bold mb-4">
           Organize Your Thoughts, Effortlessly
@@ -108,7 +102,6 @@ export default function Home() {
         </Link>
       </header>
 
-      {/* Features Section */}
       <section className="max-w-3xl mx-auto p-6 text-center">
         <h3 className="text-2xl font-bold mb-6">Why Choose NoteMaster?</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -133,7 +126,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="text-center p-4 bg-gray-200 text-gray-400 mt-10">
         &copy; {new Date().getFullYear()} NoteMaster. All rights reserved.
       </footer>

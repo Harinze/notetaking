@@ -1,5 +1,6 @@
 import connectToDB from "../../lib/connectToDB";
 import Note from "../../models/Note";
+import { withAuth } from "../../middleware/auth";
 
 export default async function handler(req, res) {
   try {
@@ -14,36 +15,44 @@ export default async function handler(req, res) {
         return res.status(200).json(notes);
       }
 
-      case "POST": {
-        const { note, tag, userId } = req.body;
-        if (!note || !userId) return res.status(400).json({ error: "Note and User ID are required" });
-
-        const newNote = await Note.create({ text: note, tag, userId, timestamp: Date.now() });
-        return res.status(201).json(newNote);
-      }
-
-      case "PUT": {
-        const { id, newText, userId } = req.body;
-        if (!id || !newText || !userId) return res.status(400).json({ error: "Invalid input" });
-
-        const updatedNote = await Note.findOneAndUpdate(
-          { _id: id, userId },
-          { text: newText, timestamp: Date.now() },
-          { new: true, runValidators: true }
-        );
-
-        if (!updatedNote) return res.status(404).json({ error: "Note not found or unauthorized" });
-        return res.status(200).json(updatedNote);
-      }
-
+      case "POST":
+      case "PUT":
       case "DELETE": {
-        const { id, userId } = req.body;
-        if (!id || !userId) return res.status(400).json({ error: "Note ID and User ID are required" });
+        return withAuth(req, res, async () => {
+          const userId = req.user.userId;
 
-        const deletedNote = await Note.findOneAndDelete({ _id: id, userId });
-        if (!deletedNote) return res.status(404).json({ error: "Note not found or unauthorized" });
+          if (req.method === "POST") {
+            const { note, tag } = req.body;
+            if (!note) return res.status(400).json({ error: "Note content is required" });
 
-        return res.status(200).json({ message: "Note deleted successfully" });
+            const newNote = await Note.create({ text: note, tag, userId, timestamp: Date.now() });
+            return res.status(201).json(newNote);
+          }
+
+          if (req.method === "PUT") {
+            const { id, newText } = req.body;
+            if (!id || !newText) return res.status(400).json({ error: "Invalid input" });
+
+            const updatedNote = await Note.findOneAndUpdate(
+              { _id: id, userId },
+              { text: newText, timestamp: Date.now() },
+              { new: true, runValidators: true }
+            );
+
+            if (!updatedNote) return res.status(404).json({ error: "Note not found or unauthorized" });
+            return res.status(200).json(updatedNote);
+          }
+
+          if (req.method === "DELETE") {
+            const { id } = req.body;
+            if (!id) return res.status(400).json({ error: "Note ID is required" });
+
+            const deletedNote = await Note.findOneAndDelete({ _id: id, userId });
+            if (!deletedNote) return res.status(404).json({ error: "Note not found or unauthorized" });
+
+            return res.status(200).json({ message: "Note deleted successfully" });
+          }
+        });
       }
 
       default:
@@ -54,4 +63,3 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: "Internal Server Error" });
   }
 }
-

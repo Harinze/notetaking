@@ -93,7 +93,7 @@ export default function NoteList({ notes, deleteNote, updateNote, isLoading }) {
         )}
       </div>
       
-      {oldNotes.length > 0 && (
+      {oldNotes?.length > 0 && (
         <div className="w-full lg:w-1/4 bg-gray-100 p-4 rounded-xl shadow-md h-fit self-start sticky top-6">
           <h2 className="text-lg font-semibold text-gray-800 mb-4 text-center">Older Notes</h2>
           <div className="space-y-3 max-h-[400px] overflow-y-auto">

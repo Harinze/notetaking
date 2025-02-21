@@ -1,6 +1,12 @@
 import User from "../../models/User";
+import Session from "../../models/Session";
 import connectToDB from "../../lib/connectToDB";
 import bcrypt from "bcrypt";
+import { v4 as uuidv4 } from "uuid";
+import cookie from "cookie";
+
+const MAX_SESSION_TIME = 6 * 60 * 60 * 1000;
+
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -26,17 +32,27 @@ export default async function handler(req, res) {
       return res.status(401).json({ error: "Invalid email or password" });
     }
 
-    req.session = {
-      user: {
-        userId: user._id,
-        fullName: user.fullName,
-        isVerified: user.isVerified,
-      },
-    };
+    const now = new Date();
+
+    const sessionToken = uuidv4();
+    const expiresAt = new Date(Date.now() + MAX_SESSION_TIME);
+
+    await Session.create({
+      userId: user._id,
+      sessionToken,
+      expiresAt,
+      lastActivity: now
+    });
 
     res.setHeader(
       "Set-Cookie",
-      `session=${JSON.stringify(req.session.user)}; Path=/; HttpOnly; Max-Age=${24 * 60 * 60}`
+      cookie.serialize("sessionToken", sessionToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "lax",
+        path: "/",
+        maxAge: MAX_SESSION_TIME,
+      })
     );
 
     return res.status(200).json({ success: true, message: "Login successful", isVerified: user.isVerified });
@@ -45,3 +61,4 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: "Server error" });
   }
 }
+

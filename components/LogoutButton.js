@@ -21,7 +21,6 @@ export default function LogoutButton({ className = "" }) {
 
       if (response.ok) {
         router.push("/");
-        window.location.reload()
       } else {
         showToast("Logout failed. Please try again or refresh the page, refresh the page");
       }

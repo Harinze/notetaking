@@ -7,6 +7,7 @@ import Header from "../../components/Header";
 import { showToast } from "../../utils/toastConfig"; 
 import {useRouter} from "next/navigation";
 import { Loader2 } from "lucide-react";
+import apiClient from "../../utils/apiClient";
 
 export default function Home() {
   const [notes, setNotes] = useState([]);
@@ -19,149 +20,99 @@ export default function Home() {
   const [loadingUser, setLoadingUser] = useState(false)
   const router = useRouter()
 
-  // Fetch user details
   useEffect(() => {
     fetchUser();
   }, []);
 
-  // const fetchUser = async () => {
-  //   setLoadingUser(true);
-  //   try {
-  //     const res = await fetch("/api/get-user");
-  //     if (res.ok) {
-  //       const data = await res.json();
-  //       setUser(data);
-  //       fetchNotes(data.userId);
-  //     } else {
-  //       const sessionCookie = document.cookie
-  //         .split("; ")
-  //         .find((row) => row.startsWith("session="));
-  
-  //       if (sessionCookie) {
-  //         const sessionData = JSON.parse(decodeURIComponent(sessionCookie.split("=")[1]));
-  //         setUser(sessionData);
-  //         fetchNotes(sessionData.userId);
-  //         return;
-  //       }
-  
-  //       showToast("error", "User not authenticated!");
-  //       router.push("/login");
-  //     }
-  //   } catch (error) {
-  //     console.error("Error fetching user:", error);
-  //     router.push("/login");
-  //   } finally {
-  //     setLoadingUser(false);
-  //   }
-  // };
-  
 
-  const fetchUser = async () => {
-    setLoadingUser(true);
-    try {
-      const res = await fetch("/api/get-user");
-  
-      if (!res.ok) {
-        showToast("error", "User not authenticated!");
-        router.push("/login");
-        return;
-      }
-  
-      const data = await res.json();
-      setUser(data);
-      fetchNotes(data.userId);
-    } catch (error) {
-      console.error("Error fetching user:", error);
+const fetchUser = async () => {
+  setLoadingUser(true);
+  try {
+    const res = await apiClient.get("/get-user");
+
+    if (res.status !== 200) {
+      showToast("error", "User not authenticated!");
       router.push("/login");
-    } finally {
-      setLoadingUser(false);
+      return;
     }
-  };
-  
 
-  const fetchNotes = async (userId) => {
-    setLoading(true);
-    try {
-      const res = await fetch(`/api/notes?userId=${userId}`);
-      const data = await res.json();
-      setNotes(data);
-    } catch (error) {
-      showToast("error", "Failed to fetch notes!");
-    }
+    const data = res.data.user;
+    setUser(data);
+    fetchNotes(data?.userId);
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    router.push("/login");
+  } finally {
+    setLoadingUser(false);
+  }
+};
+
+const fetchNotes = async (userId) => {
+  setLoading(true);
+  try {
+    const res = await apiClient.get(`/notes`, { params: { userId } });
+    setNotes(res.data);
+  } catch (error) {
+    showToast("error", "Failed to fetch notes!");
+  } finally {
     setLoading(false);
-  };
+  }
+};
 
-  const addNote = async (note, tag) => {
-    if (!user) {
-      showToast("error", "You must be logged in to add notes.");
-      return;
-    }
+const addNote = async (note, tag) => {
+  if (!user) {
+    showToast("error", "You must be logged in to add notes.");
+    return;
+  }
 
-    setActionLoading(true);
-    try {
-      const res = await fetch("/api/notes", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ note, tag, userId: user.userId }),
-      });
-
-      if (!res.ok) throw new Error("Failed to add note");
-
-      fetchNotes(user.userId);
-      showToast("success", "Note added successfully!");
-    } catch (error) {
-      showToast("error", "Error adding note!");
-    }
+  setActionLoading(true);
+  try {
+    await apiClient.post("/notes", { note, tag, userId: user.userId });
+    fetchNotes(user.userId);
+    showToast("success", "Note added successfully!");
+  } catch (error) {
+    showToast("error", "Error adding note!");
+  } finally {
     setActionLoading(false);
-  };
+  }
+};
 
-  const updateNote = async (id, newText) => {
-    if (!user) {
-      showToast("error", "You must be logged in to update notes.");
-      return;
-    }
+const updateNote = async (id, newText) => {
+  if (!user) {
+    showToast("error", "You must be logged in to update notes.");
+    return;
+  }
 
-    setUpdateLoading(id);
-    try {
-      const res = await fetch("/api/notes", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, newText, userId: user.userId }),
-      });
-
-      if (!res.ok) throw new Error("Failed to update note");
-
-      fetchNotes(user.userId);
-      showToast("success", "Note updated!");
-    } catch (error) {
-      showToast("error", "Error updating note!");
-    }
+  setUpdateLoading(id);
+  try {
+    await apiClient.put("/notes", { id, newText, userId: user.userId });
+    fetchNotes(user.userId);
+    showToast("success", "Note updated!");
+  } catch (error) {
+    showToast("error", "Error updating note!");
+  } finally {
     setUpdateLoading(null);
-  };
+  }
+};
 
-  const deleteNote = async (id) => {
-    if (!user) {
-      showToast("error", "You must be logged in to delete notes.");
-      return;
-    }
+const deleteNote = async (id) => {
+  if (!user) {
+    showToast("error", "You must be logged in to delete notes.");
+    return;
+  }
 
-    setDeleteLoading(id);
-    try {
-      const res = await fetch("/api/notes", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, userId: user.userId }),
-      });
-
-      if (!res.ok) throw new Error("Failed to delete note");
-
-      fetchNotes(user.userId);
-      showToast("success", "Note deleted!");
-    } catch (error) {
-      showToast("error", "Error deleting note!");
-    }
+  setDeleteLoading(id);
+  try {
+    await apiClient.delete(`/notes`, { data: { id, userId: user.userId } });
+    fetchNotes(user.userId);
+    showToast("success", "Note deleted!");
+  } catch (error) {
+    showToast("error", "Error deleting note!");
+  } finally {
     setDeleteLoading(null);
-  };
+  }
+};
+
 
   const filteredNotes = notes?.filter((note) =>
     note.text.toLowerCase().includes(searchQuery.toLowerCase())
