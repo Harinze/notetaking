@@ -1,7 +1,6 @@
 import redis from "../utils/redis";
 import cookie from "cookie";
 
-
 const MAX_SESSION_TIME = 6 * 60 * 60 * 1000; 
 const MAX_INACTIVITY_TIME = 1 * 60 * 60 * 1000; 
 

@@ -39,7 +39,7 @@ export default function NotesPage() {
   return (
     <div>
       <Navbar />
-      <div className="min-h-screen bg-gray-50 p-6 md:p-10 flex flex-col items-center">
+      <div className="bg-gray-50 p-6 md:p-10 flex flex-col items-center">
         <h1 className="text-3xl font-bold text-black mb-6">My Notes</h1>
         {loading && <Loader />}
         {error && <p className="text-red-500">{error}</p>}
