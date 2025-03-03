@@ -37,6 +37,7 @@ const fetchUser = async () => {
     }
 
     const data = res.data.user;
+
     setUser(data);
     fetchNotes(data?.userId);
   } catch (error) {
@@ -136,7 +137,7 @@ if (loadingUser) {
   return (
     <div>
       <Header />
-      <div className="min-h-screen p-6 bg-gray-50 flex flex-col items-center">
+      <div className=" p-6 bg-gray-50 flex flex-col items-center">
         <div className="w-full max-w-3xl space-y-6 bg-white shadow-lg rounded-2xl p-6">
           {/* User Info */}
           {user && (

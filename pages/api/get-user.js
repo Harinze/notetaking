@@ -2,24 +2,25 @@ import { withAuth } from "../../middleware/auth";
 
 export default async function handler(req, res) {
   try {
-    return withAuth(req, res, () => {
-      if (!req.user) {
-        return res.status(401).json({
-          success: false,
-          message: "Unauthorized: No user session found.",
-        });
-      }
-      
-      const { fullName, userId } = req.user;
+    const authReq = await withAuth(req, res);
 
-      return res.status(200).json({
-        success: true,
-        user: { fullName, userId },
-      });
+    if (!authReq || !authReq.user) {
+      return; 
+    }
+
+    return res.status(200).json({
+      success: true,
+      user: {
+        fullName: authReq.user.fullName,
+        userId: authReq.user.userId,
+        email: authReq.user.email,
+        isLoggedIn: authReq.user.isLoggedIn,
+        isVerified: authReq.user.isVerified,
+        
+      },
     });
   } catch (error) {
-    console.error("API Error:", error);
-
+    console.error("❌ API Error:", error);
     return res.status(500).json({
       success: false,
       message: "An unexpected error occurred. Please try again later.",

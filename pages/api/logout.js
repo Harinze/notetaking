@@ -1,39 +1,43 @@
-import Session from "../../models/Session";
 import cookie from "cookie";
-import connectToDB from "../../lib/connectToDB";
+import redis from '../../utils/redis'
+
 
 export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method Not Allowed" });
-  }
 
- await connectToDB()
+  const cookies = cookie.parse(req.headers.cookie || "");
+  const sessionToken = cookies.sessionToken;
+
+  if (!sessionToken) return clearSessionCookie(res);
 
   try {
-    const cookies = cookie.parse(req.headers.cookie || "");
-    const sessionToken = cookies.sessionToken;
+    const sessionData = await redis.get(`session:${sessionToken}`);
 
-    if (sessionToken) {
-      await Session.deleteOne({ sessionToken });
+    if (sessionData && sessionData.userId?._id) {
+      await redis.del(`session:${sessionToken}`);
     }
-
-
-    res.setHeader(
-      "Set-Cookie",
-      cookie.serialize("sessionToken", "", {
-        httpOnly: true,
-        secure: true,
-        sameSite: "lax",
-        path: "/",
-        maxAge: 0, 
-      })
-    );
-
-    return res.status(200).json({ success: true, message: "Logged out successfully." });
   } catch (error) {
-    console.error("Logout Error:", error);
-    return res.status(500).json({ error: "Server error" });
+    console.error("Error during logout:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
   }
+
+  return clearSessionCookie(res);
 }
+
+function clearSessionCookie(res) {
+  res.setHeader(
+    "Set-Cookie",
+    cookie.serialize("sessionToken", "", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 0,
+    })
+  );
+
+  return res.status(200).json({ message: "Logged out successfully" });
+}
+
+
 
 
