@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { formatDate } from "../utils/dateUtils";
 import { motion } from "framer-motion";
+import BackButton from "./BackButton";
+
 
 export default function NoteList({ notes, deleteNote, updateNote, isLoading }) {
   const [editingId, setEditingId] = useState(null);
@@ -34,11 +36,20 @@ export default function NoteList({ notes, deleteNote, updateNote, isLoading }) {
   const threeDaysAgo = new Date();
   threeDaysAgo.setDate(today.getDate() - 3);
 
-  const recentNotes = notes?.filter((note) => new Date(note.timestamp) >= threeDaysAgo);
-  const oldNotes = notes?.filter((note) => new Date(note.timestamp) < threeDaysAgo);
+  const recentNotes = notes
+  ?.filter((note) => new Date(note.timestamp) >= threeDaysAgo)
+  .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+  const oldNotes = notes
+  ?.filter((note) => new Date(note.timestamp) < threeDaysAgo)
+  .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
 
   return (
-    <div className="mt-6 w-full max-w-4xl flex flex-col gap-6">
+
+  <div>
+   
+      <div className="mt-6 w-full max-w-4xl flex flex-col gap-6">
     <div className="flex-1">
       <h2 className="text-2xl font-bold text-gray-800 mb-4 text-center">
         Latest Notes
@@ -150,6 +161,9 @@ export default function NoteList({ notes, deleteNote, updateNote, isLoading }) {
         </div>
       </div>
     )}
-  </div>)
+  </div>
+  <BackButton/>
+  </div>
+  )
 }
 

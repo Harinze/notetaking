@@ -7,7 +7,7 @@ export default function BackButton({ className = "" }) {
   const router = useRouter();
 
   return (
-  <div className="pt-2">
+  <div className="pt-4 mt-4 mb-4">
 
       <div className="flex justify-center mb-2">
       <button
